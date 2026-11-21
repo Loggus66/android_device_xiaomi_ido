@@ -115,3 +115,7 @@ TARGET_LD_SHIM_LIBS += \
 
 # inherit from the proprietary version
 include vendor/xiaomi/ido/BoardConfigVendor.mk
+
+# 2015-era vendor blobs declare no shared_libs; every vendor-lib DT_NEEDED
+# would fail check_elf_files. All needed libs ship in vendor/lib64 anyway.
+BUILD_BROKEN_PREBUILT_ELF_FILES := true
