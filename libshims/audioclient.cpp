@@ -1,27 +1,17 @@
 /*
  * Copyright (C) 2020 The LineageOS Project
+ * SPDX-License-Identifier: Apache-2.0
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * The legacy RIL blob references android::AudioSystem::setErrorCallback
+ * (mangled: _ZN7android11AudioSystem16setErrorCallbackEPFviE), removed in O
+ * and renamed to addErrorCallback. Under VNDK 30 a vendor process cannot
+ * load libaudioclient at all, so forwarding is impossible; register the
+ * callback pointer but never invoke it. audioserver-death handling is
+ * done by the framework/HAL stack on modern builds.
  */
-
-#include <media/AudioSystem.h>
-
-namespace android
+namespace android {
+extern "C" void _ZN7android11AudioSystem16setErrorCallbackEPFviE(void (*cb)(int))
 {
-    extern "C" uintptr_t _ZN7android11AudioSystem16addErrorCallbackEPFviE(audio_error_callback cb);
-
-    extern "C" void _ZN7android11AudioSystem16setErrorCallbackEPFviE(audio_error_callback cb)
-    {
-        _ZN7android11AudioSystem16addErrorCallbackEPFviE(cb);
-    }
+    (void)cb;
+}
 } // namespace android
